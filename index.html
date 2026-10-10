@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraCipher — Zero-Knowledge Steganographic Cryptography Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/styles/main.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="navbar">
+      <div class="logo-group">
+        <div class="logo-shield">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="brand-title">AURA CIPHER</span>
+          <span class="brand-badge">ZERO-KNOWLEDGE</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="tab-btn active" data-tab="tab-encrypt">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Envelope Vault
+        </button>
+        <button class="tab-btn" data-tab="tab-stego">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Stego Lab (LSB)
+        </button>
+        <button class="tab-btn" data-tab="tab-generator">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-6 6l-2 2m-6 6l-2 2"/><polygon points="12 2 22 12 14 20 4 10 12 2"/></svg>
+          Key Generator
+        </button>
+      </nav>
+
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span class="status-label">Client Isolated (0 Network)</span>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="content-area">
+      <!-- TAB 1: Cryptographic Envelope Vault -->
+      <section id="tab-encrypt" class="tab-pane active">
+        <div class="grid-2col">
+          <!-- Encryption Card -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="header-icon icon-cyan">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </div>
+              <div>
+                <h2>Encrypt & Seal</h2>
+                <p>AES-GCM-256 with PBKDF2 100k Key Derivation</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Plaintext Payload</label>
+              <textarea id="encrypt-input" rows="4" placeholder="Enter sensitive text, private keys, or secret credentials..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Passphrase</label>
+              <div class="input-with-action">
+                <input type="password" id="encrypt-passphrase" placeholder="Passphrase (min. 6 characters)">
+                <button type="button" class="btn-subtle" id="toggle-encrypt-pass">Show</button>
+              </div>
+              <div class="password-meter-wrap">
+                <div class="meter-bar" id="encrypt-meter"></div>
+              </div>
+              <div class="meter-text" id="encrypt-meter-text">Strength: Waiting...</div>
+            </div>
+
+            <button class="btn-primary" id="btn-encrypt-action">
+              <span>Seal Envelope</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+
+            <div class="form-group output-group" id="encrypt-result-group" style="display: none;">
+              <div class="output-label-row">
+                <label>Cryptographic Envelope (Zero-Knowledge)</label>
+                <button class="btn-copy" id="copy-encrypt-result">Copy JSON</button>
+              </div>
+              <textarea id="encrypt-output" rows="4" readonly></textarea>
+            </div>
+          </div>
+
+          <!-- Decryption Card -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="header-icon icon-purple">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+              </div>
+              <div>
+                <h2>Unlock & Verify</h2>
+                <p>Verify payload integrity & decode plaintext in memory</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Aura Envelope JSON</label>
+              <textarea id="decrypt-input" rows="4" placeholder="Paste envelope payload JSON here..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Secret Passphrase</label>
+              <div class="input-with-action">
+                <input type="password" id="decrypt-passphrase" placeholder="Enter original decryption passphrase">
+                <button type="button" class="btn-subtle" id="toggle-decrypt-pass">Show</button>
+              </div>
+            </div>
+
+            <button class="btn-secondary" id="btn-decrypt-action">
+              <span>Decrypt Payload</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </button>
+
+            <div class="form-group output-group" id="decrypt-result-group" style="display: none;">
+              <div class="output-label-row">
+                <label>Decrypted Plaintext</label>
+                <button class="btn-copy" id="copy-decrypt-result">Copy</button>
+              </div>
+              <textarea id="decrypt-output" rows="4" readonly></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Steganography Lab -->
+      <section id="tab-stego" class="tab-pane">
+        <div class="grid-2col">
+          <!-- Stego Hide Card -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="header-icon icon-emerald">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </div>
+              <div>
+                <h2>Embed Secret in Pixels</h2>
+                <p>Invisible LSB manipulation across RGB channels</p>
+              </div>
+            </div>
+
+            <div class="upload-dropzone" id="stego-dropzone">
+              <input type="file" id="stego-file-input" accept="image/*" style="display: none;">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              <p>Click or drag a carrier image (PNG recommended)</p>
+              <span id="stego-filename" class="file-name-tag"></span>
+            </div>
+
+            <div class="form-group">
+              <label>Secret Message or Encrypted Envelope</label>
+              <textarea id="stego-secret-text" rows="3" placeholder="Secret text or paste ciphertext from Tab 1..."></textarea>
+            </div>
+
+            <button class="btn-primary" id="btn-stego-embed">
+              <span>Embed & Download Carrier Image</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+          </div>
+
+          <!-- Stego Extract Card -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="header-icon icon-amber">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </div>
+              <div>
+                <h2>Extract Hidden Secret</h2>
+                <p>Scan pixel bitstream & verify cryptographic signature</p>
+              </div>
+            </div>
+
+            <div class="upload-dropzone" id="stego-extract-dropzone">
+              <input type="file" id="stego-extract-input" accept="image/*" style="display: none;">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p>Drop the steganographic PNG image to inspect</p>
+              <span id="stego-extract-filename" class="file-name-tag"></span>
+            </div>
+
+            <button class="btn-secondary" id="btn-stego-extract">
+              <span>Extract Invisible Data</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+            </button>
+
+            <div class="form-group output-group" id="stego-extract-result-group" style="display: none;">
+              <div class="output-label-row">
+                <label>Extracted Hidden Payload</label>
+                <button class="btn-copy" id="copy-stego-result">Copy</button>
+              </div>
+              <textarea id="stego-extract-output" rows="4" readonly></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: Cryptographic Key & Entropy Studio -->
+      <section id="tab-generator" class="tab-pane">
+        <div class="glass-card max-w-center">
+          <div class="card-header">
+            <div class="header-icon icon-rose">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+            </div>
+            <div>
+              <h2>Hardware Entropy Key Generator</h2>
+              <p>CSP-RNG generated cryptographic seeds and master credentials</p>
+            </div>
+          </div>
+
+          <div class="key-display-box">
+            <div class="key-value" id="generated-key-display">Click Generate to create secure key</div>
+            <button class="btn-copy" id="btn-copy-generated-key">Copy</button>
+          </div>
+
+          <div class="slider-row">
+            <label>Length: <span id="key-length-label">28</span> chars</label>
+            <input type="range" id="key-length-slider" min="12" max="64" value="28">
+          </div>
+
+          <button class="btn-primary" id="btn-generate-key">
+            <span>Generate New Cryptographic Key</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Security Notice -->
+    <footer class="app-footer">
+      <div class="security-shield-pill">
+        <span class="pulse-ring"></span>
+        Zero-Knowledge Assurance: All cryptography executes strictly in sandboxed browser memory via Web Crypto API (SubtleCrypto). No secrets, keys, or files are ever transmitted.
+      </div>
+    </footer>
+  </div>
+
+  <canvas id="hidden-canvas" style="display: none;"></canvas>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
